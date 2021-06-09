@@ -1,0 +1,1 @@
+gcc -Os -I /opt/homebrew/Frameworks/Python.framework/Versions/3.9/include/python3.9 main.c -L /opt/homebrew/Frameworks/Python.framework/Versions/3.9/lib -lpython3.9 -o main

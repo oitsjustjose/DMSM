@@ -149,3 +149,4 @@ pyvenv.cfg
 *.dist
 *.build
 *.bin
+src/dmsm

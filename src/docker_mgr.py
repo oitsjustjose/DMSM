@@ -4,11 +4,70 @@ Author: Jose Stovall | oitsjustjose
 # pylint: disable=broad-except, bare-except
 
 import os
+import subprocess
 from argparse import Namespace
+from typing import Dict
+from urllib.parse import urlparse
 
 import docker
 
 from logger import Logger
+
+
+def _build_env(args: Namespace) -> Dict[str, any]:
+    """
+    This function builds an Environment dict that can be
+    directly passed into the docker container creation
+
+    Arguments:
+        args (Namespace): The CLI args
+    Return:
+        (Dict[str, any]): the args, dictified
+    """
+    ret = {
+        "VERSION": args.version,
+        "EULA": True,
+        "SPAWN_PROTECTION": 0,
+        "ALLOW_FLIGHT": True,
+        "ENFORCE_WHITELIST": True,
+    }
+
+    if args.motd:
+        ret["MOTD"] = args.motd
+    if args.memory:
+        ret["MEMORY"] = args.memory
+    if args.aikar:
+        ret["USE_AIKAR_FLAGS"] = args.aikar
+    if args.forge:
+        # Validate if url or not
+        url = urlparse(args.forge)
+        if all([url.scheme, url.netloc, url.path]):
+            ret["FORGE_INSTALLER_URL"] = args.forge
+        else:
+            ret["FORGE_INSTALLER"] = args.forge
+    if args.fabric and not args.forge:
+        # Validate if url or not
+        url = urlparse(args.fabric)
+        if all([url.scheme, url.netloc, url.path]):
+            ret["FABRIC_INSTALLER_URL"] = args.fabric
+        else:
+            ret["FABRIC_INSTALLER"] = args.fabric
+    if args.modpack:
+        ret["CF_SERVER_MOD"] = args.modpack
+        ret["TYPE"] = "CURSEFORGE"
+        ret["USE_MODPACK_START_SCRIPT"] = False
+    if args.players:
+        ret["MAX_PLAYERS"] = args.players
+    if args.seed:
+        ret["SEED"] = args.seed
+    if args.view:
+        ret["VIEW_DISTANCE"] = args.view
+    if args.leveltype:
+        ret["LEVEL_TYPE"] = args.leveltype
+
+    print(ret)
+
+    return ret
 
 
 class ServerManager:
@@ -44,15 +103,10 @@ class ServerManager:
                     f"Server root '{args.root}' exists - there may be problems!"
                 )
             self._client.containers.run(
-                "itzg/minecraft-server",
+                f"itzg/minecraft-server:java{args.java}",
                 name=self._name,
                 ports={25565: args.port},
-                environment={
-                    "VERSION": args.version,
-                    "EULA": True,
-                    "MOTD": args.motd,
-                    "MEMORY": args.maxr,
-                },
+                environment=_build_env(args),
                 volumes={args.root: {"bind": "/data", "mode": "rw"}},
                 detach=True,
             )
@@ -116,9 +170,34 @@ class ServerManager:
         """
         Gets the status of a contianer
         """
-        self._log.info(self._container.status)
+        health = str(
+            subprocess.check_output(
+                [
+                    "docker",
+                    "container",
+                    "inspect",
+                    "-f",
+                    "{{ .State.Health.Status }}",
+                    self._name,
+                ]
+            )
+            .decode()
+            .replace("\n", "")
+        )
+        container_status: str = self._container.status
+
+        if container_status.lower() == "running":
+            if health.lower() == "healthy":
+                self._log.success("Server is running and healthy")
+            elif health.lower() == "starting":
+                self._log.notice("Server is starting")
+            else:
+                self._log.warn(f"Server is running but in degraded state: {health}")
+        else:
+            self._log.info(f"Server is {self._container.status}")
 
     def open_console(self):
         """
         Connects the user to the server's console
         """
+        os.system(f"docker exec -i {self._name} rcon-cli")

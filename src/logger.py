@@ -3,6 +3,7 @@ Author: Jose Stovall | oitsjustjose
 """
 
 from typing import Union
+
 from pip._vendor.colorama import Fore
 
 
@@ -58,3 +59,12 @@ class Logger:
             _with_color(f"[{self._name}]: {msg}", Fore.RED)
         else:
             _with_color(msg, Fore.RED)
+
+    def notice(self, msg: str) -> None:
+        """
+        Prints out a notice in a color that will be seen
+        """
+        if self._name:
+            _with_color(f"[{self._name}]: {msg}", Fore.BLUE)
+        else:
+            _with_color(msg, Fore.BLUE)

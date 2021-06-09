@@ -137,7 +137,10 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-./bin/**/*
-./lib/**/*
+./bin/
+./lib/
+./src/out/
+./src/build/
+
 
 .DS_Store

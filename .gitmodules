@@ -1,0 +1,3 @@
+[submodule "shedskin"]
+	path = shedskin
+	url = https://github.com/shedskin/shedskin.git

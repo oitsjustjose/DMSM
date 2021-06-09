@@ -4,14 +4,14 @@ Author: Jose Stovall | oitsjustjose
 # pylint: disable=broad-except, bare-except
 
 import os
-from typing import Union
+from argparse import Namespace
 
 import docker
 
 from logger import Logger
 
 
-class DockerManager:
+class ServerManager:
     """
     A Management system for a docker container
     """
@@ -34,26 +34,26 @@ class DockerManager:
         """
         return self._client
 
-    def create_server(
-        self, version: str, port: Union[int, str], root: str, motd="", maxr="2G"
-    ):
+    def create_server(self, args: Namespace):
         """
         Creates a new docker container
         """
         try:
-            if os.path.exists(root):
-                self._log.warn(f"Server root '{root}' exists - there may be problems!")
+            if os.path.exists(args.root):
+                self._log.warn(
+                    f"Server root '{args.root}' exists - there may be problems!"
+                )
             self._client.containers.run(
                 "itzg/minecraft-server",
                 name=self._name,
-                ports={25565: port},
+                ports={25565: args.port},
                 environment={
-                    "VERSION": version,
+                    "VERSION": args.version,
                     "EULA": True,
-                    "MOTD": motd,
-                    "MEMORY": maxr,
+                    "MOTD": args.motd,
+                    "MEMORY": args.maxr,
                 },
-                volumes={root: {"bind": "/data", "mode": "rw"}},
+                volumes={args.root: {"bind": "/data", "mode": "rw"}},
                 detach=True,
             )
             self._container = self._get_container()
@@ -111,3 +111,14 @@ class DockerManager:
             self._log.success("Successfully Restarted Server")
         except:
             self._log.err("Failed to Restart Server")
+
+    def get_status(self):
+        """
+        Gets the status of a contianer
+        """
+        self._log.info(self._container.status)
+
+    def open_console(self):
+        """
+        Connects the user to the server's console
+        """

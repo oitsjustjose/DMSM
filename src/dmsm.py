@@ -5,7 +5,7 @@ Author: Jose Stovall | oitsjustjose
 import argparse
 import sys
 
-from docker_mgr import DockerManager
+from docker_mgr import ServerManager
 from logger import Logger
 
 
@@ -21,7 +21,7 @@ def get_args() -> argparse.Namespace:
         (argparse.NameSpace) the arguments for the program
     """
     parser = argparse.ArgumentParser(
-        description="Arguments for DockerPM",
+        description="Arguments for Docker Minecraft Server Management (DMSM)",
     )
 
     if len(sys.argv) >= 2 and sys.argv[1] == "create":
@@ -29,6 +29,7 @@ def get_args() -> argparse.Namespace:
             "-p",
             "--port",
             help="The port to run the newly created server on",
+            default="25565",
             required=True,
         )
         parser.add_argument(
@@ -53,8 +54,8 @@ def get_args() -> argparse.Namespace:
             "-m",
             "--memory",
             help="The amount of dedicated memory for the server",
-            required=False,
             default="2G",
+            required=False,
         )
 
     if len(sys.argv) >= 2 and sys.argv[1] in ["stop", "restart"]:
@@ -86,16 +87,10 @@ def main(args: argparse.Namespace) -> None:
 
     action = sys.argv[1]
     server_name = sys.argv[2]
-    mgr = DockerManager(server_name)
+    mgr = ServerManager(server_name)
 
     if action == "create":
-        mgr.create_server(
-            version=args.version,
-            port=args.port,
-            root=args.root,
-            motd=args.motd,
-            maxr=args.memory,
-        )
+        mgr.create_server(args)
     elif action == "start":
         mgr.start_server()
     elif action == "stop":
@@ -104,6 +99,10 @@ def main(args: argparse.Namespace) -> None:
         mgr.restart_server(force=args.force)
     elif action == "delete":
         mgr.delete_server()
+    elif action == "status":
+        mgr.get_status()
+    elif action == "console":
+        mgr.open_console()
 
 
 if __name__ == "__main__":

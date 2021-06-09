@@ -145,3 +145,7 @@ src/build/
 pyvenv.cfg
 
 .DS_Store
+
+*.dist
+*.build
+*.bin

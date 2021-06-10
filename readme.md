@@ -10,7 +10,7 @@ DMSM is for **Unix Systems Only**. I have compiled it for macOS (both ARM and x8
 
 ### Requirements
 
-The only requirement for using this is Docker. The application is written in Python but compiled to an executible, so you don't even need Python. All you need is docker, which you can find how to set up [here]https://docs.docker.com/get-docker/).
+The only requirement for using this is Docker. The application is written in Python but compiled to an executible, so you don't even need Python. All you need is docker, which you can find how to set up [here](https://docs.docker.com/get-docker/).
 
 ### Install
 

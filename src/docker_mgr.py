@@ -45,6 +45,7 @@ def _build_env(args: Namespace) -> Dict[str, any]:
             ret["FORGE_INSTALLER_URL"] = args.forge
         else:
             ret["FORGE_INSTALLER"] = args.forge
+        ret["TYPE"] = "FORGE"
     if args.fabric and not args.forge:
         # Validate if url or not
         url = urlparse(args.fabric)
@@ -52,6 +53,7 @@ def _build_env(args: Namespace) -> Dict[str, any]:
             ret["FABRIC_INSTALLER_URL"] = args.fabric
         else:
             ret["FABRIC_INSTALLER"] = args.fabric
+        ret["TYPE"] = "FABRIC"
     if args.modpack:
         ret["CF_SERVER_MOD"] = args.modpack
         ret["TYPE"] = "CURSEFORGE"
@@ -64,8 +66,6 @@ def _build_env(args: Namespace) -> Dict[str, any]:
         ret["VIEW_DISTANCE"] = args.view
     if args.leveltype:
         ret["LEVEL_TYPE"] = args.leveltype
-
-    print(ret)
 
     return ret
 

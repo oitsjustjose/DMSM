@@ -6,6 +6,7 @@ import argparse
 import sys
 
 from logger import Logger
+from constants import SERVER_ENVS
 
 
 def get_args() -> argparse.Namespace:
@@ -21,6 +22,7 @@ def get_args() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(
         description="Arguments for Docker Minecraft Server Management (DMSM)",
+        add_help=False,
     )
 
     if len(sys.argv) >= 2 and sys.argv[1] == "create":
@@ -69,7 +71,12 @@ def _create(parser: argparse.ArgumentParser):
     #  Below are the more common commands, with shortcuts  #
     ########################################################
 
-    parser.add_argument(
+    required = parser.add_argument_group("Required Arguments")
+    optional = parser.add_argument_group(
+        "Optional Arguments (oitsjustjo.se/u/Z9mLwAY40)"
+    )
+
+    required.add_argument(
         "-p",
         "--port",
         help="The port to run the newly created server on",
@@ -77,91 +84,22 @@ def _create(parser: argparse.ArgumentParser):
         required=True,
     )
 
-    parser.add_argument(
+    required.add_argument(
         "-v",
         "--version",
         help="The version of Minecraft to run",
         required=True,
     )
 
-    parser.add_argument(
+    required.add_argument(
         "-r",
         "--root",
         help="The root on your disk for THIS server",
         required=True,
     )
 
-    parser.add_argument(
-        "-s",
-        "--seed",
-        help="The seed to use for the world",
-        required=False,
-    )
-
-    parser.add_argument(
-        "-l",
-        "--leveltype",
-        help="The level type to use for the world",
-        required=False,
-    )
-
-    ########################################################
-    #       Less common commands, with no shortcuts        #
-    ########################################################
-
-    parser.add_argument(
-        "--view",
-        help="The view distance the server should run at",
-        required=False,
-    )
-
-    parser.add_argument(
-        "--motd",
-        help="The MOTD for the server",
-        required=False,
-    )
-
-    parser.add_argument(
-        "--memory",
-        help="The amount of dedicated memory for the server",
-        required=False,
-    )
-
-    parser.add_argument(
-        "--aikar",
-        help="If flag is included, loads the server using aikar's flags",
-        action="store_true",
-        required=False,
-    )
-
-    parser.add_argument(
-        "--java",
-        help="Allows you to specify the java version",
-        choices=['8', '11', '16'],
-        default=16,
-        required=False,
-    )
-
-    parser.add_argument(
-        "--forge",
-        help="Allows you to provide either a URL or Path to a Forge installer",
-        required=False,
-    )
-
-    parser.add_argument(
-        "--fabric",
-        help="Allows you to provide either a URL or Path to a Fabric installer",
-        required=False,
-    )
-
-    parser.add_argument(
-        "--modpack",
-        help="Allows you to specify a CURSEFORGE modpack",
-        required=False,
-    )
-
-    parser.add_argument(
-        "--players",
-        help="Allows you to specify the max player count",
-        required=False,
-    )
+    for env in SERVER_ENVS:
+        optional.add_argument(
+            f"--{env.lower()}",
+            required=False,
+        )

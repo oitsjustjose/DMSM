@@ -27,45 +27,7 @@ def _build_env(args: Namespace) -> Dict[str, any]:
     ret = {
         "VERSION": args.version,
         "EULA": True,
-        "SPAWN_PROTECTION": 0,
-        "ALLOW_FLIGHT": True,
-        "ENFORCE_WHITELIST": True,
     }
-
-    if args.motd:
-        ret["MOTD"] = args.motd
-    if args.memory:
-        ret["MEMORY"] = args.memory
-    if args.aikar:
-        ret["USE_AIKAR_FLAGS"] = args.aikar
-    if args.forge:
-        # Validate if url or not
-        url = urlparse(args.forge)
-        if all([url.scheme, url.netloc, url.path]):
-            ret["FORGE_INSTALLER_URL"] = args.forge
-        else:
-            ret["FORGE_INSTALLER"] = args.forge
-        ret["TYPE"] = "FORGE"
-    if args.fabric and not args.forge:
-        # Validate if url or not
-        url = urlparse(args.fabric)
-        if all([url.scheme, url.netloc, url.path]):
-            ret["FABRIC_INSTALLER_URL"] = args.fabric
-        else:
-            ret["FABRIC_INSTALLER"] = args.fabric
-        ret["TYPE"] = "FABRIC"
-    if args.modpack:
-        ret["CF_SERVER_MOD"] = args.modpack
-        ret["TYPE"] = "CURSEFORGE"
-        ret["USE_MODPACK_START_SCRIPT"] = False
-    if args.players:
-        ret["MAX_PLAYERS"] = args.players
-    if args.seed:
-        ret["SEED"] = args.seed
-    if args.view:
-        ret["VIEW_DISTANCE"] = args.view
-    if args.leveltype:
-        ret["LEVEL_TYPE"] = args.leveltype
 
     return ret
 
@@ -79,6 +41,7 @@ class ServerManager:
         self._name = name
         self._client = docker.from_env()
         self._container = self._get_container()
+        self._backup_container = None
         self._log = Logger(name=self._name)
 
     def _get_container(self):
@@ -115,6 +78,26 @@ class ServerManager:
 
         except Exception as exception:
             self._log.err("Failed to Create Server")
+            self._log.err(exception)
+
+    def _start_backup_cont(self, args: Namespace):
+        """
+        Creates a container for the backup service
+        """
+        try:
+            self._backup_container = self._client.containers.run(
+                "itzg/mc-backup",
+                name=f"{self._name}-Backup",
+                environment={},
+                volumes={
+                    args.root: {"bind": "/data", "mode": "ro"},
+                    isnone(
+                        args.backupdir, f"{dir_above(args.root)}/{self._name}-Backups"
+                    ): {"bind": "/backups", "mode": "rw"},
+                },
+            )
+        except Exception as exception:
+            self._log.err("Failed to Create Backup Service for Server")
             self._log.err(exception)
 
     def delete_server(self):
@@ -201,3 +184,30 @@ class ServerManager:
         Connects the user to the server's console
         """
         os.system(f"docker exec -i {self._name} rcon-cli")
+
+
+def isnone(value: any, default: any):
+    """
+    Equivalent to ISNULL in SQL because I'm spoiled 😛
+    Checks to see if value is none, returns the default if it is
+    Arguments:
+        value (any): The value to check
+        default (any): The fallback value to use
+    Returns:
+        (any): value if value isn't None, else rdefault
+    """
+    return default if value is None else value
+
+
+def dir_above(dir: str) -> str:
+    """
+    Determines what directory is above the current directory
+    Arguments:
+        dir (str): the directory to 'cd ..' on
+    Returns:
+        (str): the directory up one level from dir, if any
+            (None) if value is /
+    """
+
+    dir = dir[:-1] if dir.endswith("/") else dir
+    return "/".join(dir.split("/")[:-1]) + "/"

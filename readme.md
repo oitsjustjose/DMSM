@@ -47,7 +47,3 @@ Building this tool is straight forward. What you'll need:
 - Pip Packages described in `requirements.txt` (you can install them via `pip install -r requirements.txt`)
 
 All you have to do once you have the dependencies handled is to run `python3 -m nuitka --standalone --onefile dmsm.py` from within the `src` folder.
-
-## Running
-
-The CLI will help you do this -- give me a bit and I'll write up more docs on this!

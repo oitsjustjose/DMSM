@@ -487,7 +487,7 @@ Whether to use a FTB/Curseforge Modpack's default `start.bat` batch script over 
 
 ### use_native_transport | Type: `bool` | Default: `true`
 
-Control over optimized packet sending/receiving on Linux 
+Control over optimized packet sending/receiving on Linux. Can be changed at any time via `server.properties`.
 
 ### view_distance | Type: `int` | Default: `10`
 

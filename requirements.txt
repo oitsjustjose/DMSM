@@ -9,7 +9,7 @@ click==8.0.1
 coverage==5.3
 cryptography==2.1.4
 Cython==0.29.23
-dataclasses==0.8
+dataclasses
 distlib==0.3.1
 docker==5.0.0
 filelock==3.0.12
@@ -33,7 +33,7 @@ pycodestyle==2.6.0
 pycrypto==2.6.1
 pyflakes==2.2.0
 Pygments==2.7.2
-pygobject==3.26.1
+pygobject
 pylint==2.8.3
 pyxdg==0.25
 qmk==0.0.36

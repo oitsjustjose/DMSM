@@ -9,6 +9,7 @@ from argparse import Namespace
 from typing import Dict
 
 import docker
+from constants import SERVER_ENVS
 
 from logger import Logger
 
@@ -26,7 +27,8 @@ def _build_env(args: Namespace) -> Dict[str, any]:
     ret = {"VERSION": args.version, "EULA": True}
     for arg in vars(args):
         if getattr(args, arg):
-            ret[arg.upper()] = getattr(args, arg)
+            if arg in SERVER_ENVS.keys():
+                ret[arg.upper()] = getattr(args, arg)
 
     return ret
 
@@ -75,6 +77,9 @@ class ServerManager:
             self._container = self._get_container()
             self._log.success("Successfully Created Server")
 
+            if args.backup:
+                self._start_backup_cont(args)
+
         except Exception as exception:
             self._log.err("Failed to Create Server")
             self._log.err(exception)
@@ -84,17 +89,18 @@ class ServerManager:
         Creates a container for the backup service
         """
         try:
-            self._backup_container = self._client.containers.run(
+            self._client.containers.run(
                 "itzg/mc-backup",
                 name=f"{self._name}-Backup",
-                environment={},
+                environment={"INITIAL_DELAY": "0m", "BACKUP_INTERVAL": "30m"},
                 volumes={
                     args.root: {"bind": "/data", "mode": "ro"},
-                    isnone(
-                        args.backupdir, f"{dir_above(args.root)}/{self._name}-Backups"
-                    ): {"bind": "/backups", "mode": "rw"},
+                    args.backup: {"bind": "/backups", "mode": "rw"},
                 },
+                network=f"container:{self._name}",
+                detach=True,
             )
+            self._log.success("Successfully Started Backups")
         except Exception as exception:
             self._log.err("Failed to Create Backup Service for Server")
             self._log.err(exception)
@@ -183,30 +189,3 @@ class ServerManager:
         Connects the user to the server's console
         """
         os.system(f"docker exec -i {self._name} rcon-cli")
-
-
-def isnone(value: any, default: any):
-    """
-    Equivalent to ISNULL in SQL because I'm spoiled 😛
-    Checks to see if value is none, returns the default if it is
-    Arguments:
-        value (any): The value to check
-        default (any): The fallback value to use
-    Returns:
-        (any): value if value isn't None, else rdefault
-    """
-    return default if value is None else value
-
-
-def dir_above(dir: str) -> str:
-    """
-    Determines what directory is above the current directory
-    Arguments:
-        dir (str): the directory to 'cd ..' on
-    Returns:
-        (str): the directory up one level from dir, if any
-            (None) if value is /
-    """
-
-    dir = dir[:-1] if dir.endswith("/") else dir
-    return "/".join(dir.split("/")[:-1]) + "/"

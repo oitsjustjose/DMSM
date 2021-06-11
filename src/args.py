@@ -107,6 +107,14 @@ def _create(parser: argparse.ArgumentParser):
         required=False,
     )
 
+    optional.add_argument(
+        "-b",
+        "--backup",
+        help="Enable backups every 30 minutes to the location provided. Example: -b './mc-backups'",
+        default=None,
+        required=False,
+    )
+
     for env in SERVER_ENVS.keys():
         optional.add_argument(
             f"--{env}",

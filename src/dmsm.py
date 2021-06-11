@@ -16,8 +16,8 @@ def main(args: Namespace) -> None:
         args (NameSpace): the program's args
     """
 
-    action = sys.argv[1]
-    server_name = sys.argv[2]
+    action = args.task[0]
+    server_name = args.servername[0]
     mgr = ServerManager(server_name)
 
     if action == "create":
@@ -25,9 +25,9 @@ def main(args: Namespace) -> None:
     elif action == "start":
         mgr.start_server()
     elif action == "stop":
-        mgr.stop_server(force="-f" in sys.argv or "--force" in sys.argv)
+        mgr.stop_server(force=args.force)
     elif action == "restart":
-        mgr.restart_server(force="-f" in sys.argv or "--force" in sys.argv)
+        mgr.restart_server(force=args.force)
     elif action == "delete":
         mgr.delete_server()
     elif action == "status":

@@ -8,6 +8,8 @@ import sys
 from constants import SERVER_ENVS
 from logger import Logger
 
+LOGGER = Logger()
+
 
 def get_args() -> argparse.Namespace:
     """
@@ -20,25 +22,59 @@ def get_args() -> argparse.Namespace:
     Returns:
         (argparse.NameSpace) the arguments for the program
     """
-    parser = argparse.ArgumentParser(
-        description="Arguments for Docker Minecraft Server Management (DMSM)",
-        add_help=False,
+    parser = argparse.ArgumentParser(description="Arguments for DMSM", add_help=False)
+
+    positional = parser.add_argument_group("Positional Arguments")
+    positional.add_argument(
+        "servername",
+        nargs=1,
+        type=str,
+    )
+    positional.add_argument(
+        "task",
+        choices=[
+            "create",
+            "start",
+            "stop",
+            "restart",
+            "delete",
+            "status",
+            "console",
+            "logs",
+            "help",
+            "?",
+        ],
+        nargs=1,
+        type=str,
     )
 
-    if len(sys.argv) >= 2 and sys.argv[1] == "create":
+    # If the user performs dmsm <SERVER_NAME> create:
+    if len(sys.argv) >= 3 and sys.argv[2] == "create":
         _create(parser)
 
-    if not _validate(parser):
-        sys.exit(1)
+    if len(sys.argv) >= 3 and sys.argv[2] in ["stop", "restart"]:
+        parser.add_argument(
+            "-f",
+            "--force",
+            help="Forces the Minecraft server to shut down",
+            required=False,
+            action="store_true",
+        )
 
-    return parser.parse_args(args=sys.argv[3:])
+    if len(sys.argv) >= 2:
+        # If the user performs dmsm ? or dmsm help
+        if "help" in sys.argv[1].lower() or "?" in sys.argv[1].lower():
+            _create(parser)
+            parser.print_help()
+            sys.exit(1)
+
+    return parser.parse_args()
 
 
 def _validate(parser: argparse.ArgumentParser) -> bool:
-    if len(sys.argv) < 3:
-        logger = Logger()
-        logger.err("This utility requires at least the following:")
-        logger.info(
+    if len(sys.argv) < 2:
+        LOGGER.err("This utility requires at least the following:")
+        LOGGER.info(
             f"\t{sys.argv[0]} (create|start|stop|restart|delete) SERVERNAME [options]"
         )
         parser.print_help()
@@ -56,8 +92,9 @@ def _create(parser: argparse.ArgumentParser):
     ########################################################
 
     required = parser.add_argument_group("Required Arguments")
-    optional = parser.add_argument_group(
-        "Optional Arguments (oitsjustjo.se/u/Z9mLwAY40)"
+    optional = parser.add_argument_group("Optional Arguments")
+    server = parser.add_argument_group(
+        "Additional Server Flags (https://oitsjustjo.se/u/Z9mLwAY40)"
     )
 
     required.add_argument(
@@ -99,9 +136,10 @@ def _create(parser: argparse.ArgumentParser):
         required=False,
     )
 
-    for env in SERVER_ENVS.keys():
-        optional.add_argument(
+    for env in SERVER_ENVS:
+        server.add_argument(
             f"--{env}",
             required=False,
-            type=SERVER_ENVS[env],
+            type=SERVER_ENVS[env]["type"],
+            help=SERVER_ENVS[env]["help"],
         )

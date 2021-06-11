@@ -6,9 +6,6 @@ import argparse
 import sys
 
 from constants import SERVER_ENVS
-from logger import Logger
-
-LOGGER = Logger()
 
 
 def get_args() -> argparse.Namespace:
@@ -69,17 +66,6 @@ def get_args() -> argparse.Namespace:
             sys.exit(1)
 
     return parser.parse_args()
-
-
-def _validate(parser: argparse.ArgumentParser) -> bool:
-    if len(sys.argv) < 2:
-        LOGGER.err("This utility requires at least the following:")
-        LOGGER.info(
-            f"\t{sys.argv[0]} (create|start|stop|restart|delete) SERVERNAME [options]"
-        )
-        parser.print_help()
-        return False
-    return True
 
 
 def _create(parser: argparse.ArgumentParser):

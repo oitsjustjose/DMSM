@@ -188,4 +188,11 @@ class ServerManager:
         """
         Connects the user to the server's console
         """
+        os.system(f"docker exec -it {self._name} cat logs/latest.log")
         os.system(f"docker exec -i {self._name} rcon-cli")
+
+    def logs(self):
+        """
+        Shows the latest logs for the server
+        """
+        os.system(f"docker exec -it {self._name} cat logs/latest.log")

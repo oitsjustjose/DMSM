@@ -25,15 +25,17 @@ def main(args: Namespace) -> None:
     elif action == "start":
         mgr.start_server()
     elif action == "stop":
-        mgr.stop_server(force=args.force)
+        mgr.stop_server(force="-f" in sys.argv or "--force" in sys.argv)
     elif action == "restart":
-        mgr.restart_server(force=args.force)
+        mgr.restart_server(force="-f" in sys.argv or "--force" in sys.argv)
     elif action == "delete":
         mgr.delete_server()
     elif action == "status":
         mgr.get_status()
     elif action == "console":
         mgr.open_console()
+    elif action == "logs":
+        mgr.logs()
 
 
 if __name__ == "__main__":

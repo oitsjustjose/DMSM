@@ -14,7 +14,29 @@ The only requirement for using this is Docker. The application is written in Pyt
 
 ### Install
 
-After that, download the right executible for you in the [Releases Page](https://github.com/oitsjustjose/DMSM/releases), move it to wherever you keep things (like `/usr/local/bin` for unix-based systems)
+An installer has been created for Unix-based users which can be found on the [Releases Page](https://github.com/oitsjustjose/DMSM/releases). Once downloaded, run it as root.
+
+### Usage
+
+**Create**
+
+`dmsm create <SERVER_NAME> -p <PORT> -r <SERVER_ROOT> -v <VERSION> <...OTHER_FLAGS>`
+
+You can find all flags individually detailed (by hand 😓), within [flags.md](https://github.com/oitsjustjose/DMSM/blob/main/flags.md)
+
+**Start**: `dmsm start <SERVER_NAME>`
+
+**Stop**: `dmsm stop <SERVER_NAME> [-f|--force]`
+
+**Restart**: `dmsm restart <SERVER_NAME> [-f|--force]`
+
+**Delete**: `dmsm delete <SERVER_NAME>`
+
+**Status**: `dmsm status <SERVER_NAME>`
+
+**Console**: `dmsm console <SERVER_NAME>`
+
+**Logs**: `dmsm logs <SERVER_NAME>`
 
 ## Building
 

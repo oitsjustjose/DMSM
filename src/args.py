@@ -28,9 +28,6 @@ def get_args() -> argparse.Namespace:
     if len(sys.argv) >= 2 and sys.argv[1] == "create":
         _create(parser)
 
-    if len(sys.argv) >= 2 and sys.argv[1] in ["stop", "restart"]:
-        _stop_restart(parser)
-
     if not _validate(parser):
         sys.exit(1)
 
@@ -47,19 +44,6 @@ def _validate(parser: argparse.ArgumentParser) -> bool:
         parser.print_help()
         return False
     return True
-
-
-def _stop_restart(parser: argparse.ArgumentParser):
-    """
-    Handles adding the stop/restart arguments
-    """
-    parser.add_argument(
-        "-f",
-        "--force",
-        help="Will forcibly shut down the server",
-        action="store_true",
-        required=False,
-    )
 
 
 def _create(parser: argparse.ArgumentParser):

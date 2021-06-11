@@ -91,7 +91,7 @@ SERVER_ENVS = {
     },
     "enable_autopause": {
         "type": bool,
-        "help": "Controls whether or not the autopause feature can be enabled. Read up on it [here](https://github.com/itzg/docker-minecraft-server/blob/master/README.md#autopause).",
+        "help": "Controls whether or not the autopause feature can be enabled. Read up on it here: https://github.com/itzg/docker-minecraft-server/blob/master/README.md#autopause.",
     },
     "enable_command_block": {
         "type": bool,
@@ -245,7 +245,7 @@ SERVER_ENVS = {
     },
     "modpack": {
         "type": str,
-        "help": "Best explained [here](https://github.com/itzg/docker-minecraft-server/blob/master/README.md#downloadable-modplugin-pack-for-forge-bukkit-and-spigot-servers)",
+        "help": "Best explained here: https://github.com/itzg/docker-minecraft-server/blob/master/README.md#downloadable-modplugin-pack-for-forge-bukkit-and-spigot-servers",
     },
     "mohist_build": {
         "type": int,
@@ -401,7 +401,7 @@ SERVER_ENVS = {
     },
     "spiget_resources": {
         "type": str,
-        "help": "Not mispelled :wink:. See [here](https://github.com/itzg/docker-minecraft-server/blob/master/README.md#auto-downloading-spigotmcbukkitpapermc-plugins) for an explanation.",
+        "help": "Not mispelled :wink:. See https://github.com/itzg/docker-minecraft-server/blob/master/README.md#auto-downloading-spigotmcbukkitpapermc-plugins for an explanation.",
     },
     "spigot_download_url": {
         "type": str,
@@ -421,11 +421,11 @@ SERVER_ENVS = {
     },
     "tune_nursery_sizes": {
         "type": bool,
-        "help": "See [here](https://github.com/itzg/docker-minecraft-server/blob/master/README.md#openj9-specific-options) for a thorough explanation.",
+        "help": "See https://github.com/itzg/docker-minecraft-server/blob/master/README.md#openj9-specific-options for a thorough explanation.",
     },
     "tune_virtualized": {
         "type": bool,
-        "help": "See [here](https://github.com/itzg/docker-minecraft-server/blob/master/README.md#openj9-specific-options) for a thorough explanation.",
+        "help": "See https://github.com/itzg/docker-minecraft-server/blob/master/README.md#openj9-specific-options for a thorough explanation.",
     },
     "type": {
         "type": str,
@@ -437,11 +437,11 @@ SERVER_ENVS = {
     },
     "use_aikar_flags": {
         "type": bool,
-        "help": "Allows you to enable the use of Aikar's Flags. Read [here](https://mcflags.emc.gs) for more info.",
+        "help": "Allows you to enable the use of Aikar's Flags. Read up on it here: https://mcflags.emc.gs.",
     },
     "use_flare_flags": {
         "type": bool,
-        "help": "Used to add appropriate flags for the [Flare](https://blog.airplane.gg/flare/) profiler.",
+        "help": "Used to add appropriate flags for the Flare profiler (https://blog.airplane.gg/flare/).",
     },
     "use_large_pages": {"type": bool, "help": "Enables support for large page sizes"},
     "use_modpack_start_script": {

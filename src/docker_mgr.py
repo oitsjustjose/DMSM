@@ -7,7 +7,6 @@ import os
 import subprocess
 from argparse import Namespace
 from typing import Dict
-from urllib.parse import urlparse
 
 import docker
 
@@ -24,10 +23,10 @@ def _build_env(args: Namespace) -> Dict[str, any]:
     Return:
         (Dict[str, any]): the args, dictified
     """
-    ret = {
-        "VERSION": args.version,
-        "EULA": True,
-    }
+    ret = {"VERSION": args.version, "EULA": True}
+    for arg in vars(args):
+        if getattr(args, arg):
+            ret[arg.upper()] = getattr(args, arg)
 
     return ret
 

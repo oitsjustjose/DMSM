@@ -6,9 +6,10 @@ Author: Jose Stovall | oitsjustjose
 import os
 import subprocess
 from argparse import Namespace
-from typing import Dict
+from typing import Dict, Union
 
 import docker
+from docker.models.resource import Model
 from constants import SERVER_ENVS
 
 from logger import Logger
@@ -41,21 +42,15 @@ class ServerManager:
     def __init__(self, name):
         self._name = name
         self._client = docker.from_env()
-        self._container = self._get_container()
-        self._backup_container = None
+        self._container = self._get_container(self._name)
+        self._backup_container = self._get_container(f"{self._name}-Backup")
         self._log = Logger(name=self._name)
 
-    def _get_container(self):
+    def _get_container(self, name: str) -> Union[Model, None]:
         for container in self._client.containers.list(all=True):
-            if container.name == self._name:
+            if container.name == name:
                 return container
         return None
-
-    def get_docker_client(self):
-        """
-        Gets the Docker Client Instance
-        """
-        return self._client
 
     def create_server(self, args: Namespace):
         """
@@ -64,8 +59,13 @@ class ServerManager:
         try:
             if os.path.exists(args.root):
                 self._log.warn(
-                    f"Server root '{args.root}' exists - there may be problems!"
+                    f"Server root '{args.root}' exists. Continue Anyway? [y/n]:"
                 )
+
+                if input("> ").lower() != "y":
+                    self._log.err("Aborting..")
+                    return
+
             self._client.containers.run(
                 f"itzg/minecraft-server:java{args.java}",
                 name=self._name,
@@ -74,7 +74,7 @@ class ServerManager:
                 volumes={args.root: {"bind": "/data", "mode": "rw"}},
                 detach=True,
             )
-            self._container = self._get_container()
+            self._container = self._get_container(self._name)
             self._log.success("Successfully Created Server")
 
             if args.backup:
@@ -89,7 +89,7 @@ class ServerManager:
         Creates a container for the backup service
         """
         try:
-            self._client.containers.run(
+            self._backup_container = self._client.containers.run(
                 "itzg/mc-backup",
                 name=f"{self._name}-Backup",
                 environment={"INITIAL_DELAY": "0m", "BACKUP_INTERVAL": "30m"},
@@ -100,6 +100,7 @@ class ServerManager:
                 network=f"container:{self._name}",
                 detach=True,
             )
+            self._backup_container = self._get_container(f"{self._name}-Backup")
             self._log.success("Successfully Started Backups")
         except Exception as exception:
             self._log.err("Failed to Create Backup Service for Server")
@@ -112,6 +113,8 @@ class ServerManager:
         try:
             self.stop_server(force=True)
             self._container.remove()
+            if self._backup_container:
+                self._backup_container.remove()
             self._log.success("Successfully Deleted Server")
         except:
             self._log.err("Failed to Delete Server")
@@ -124,8 +127,11 @@ class ServerManager:
             self._log.warn("Server Already Running")
         else:
             self._container.start()
-            self._container = self._get_container()
             self._log.success("Successfully Started Server")
+        # Start the backup container if not already running
+        if self._backup_container and self._backup_container.status != "running":
+            self._backup_container.start()
+            self._log.success("Successfully Backup Service")
 
     def stop_server(self, force=False):
         """
@@ -134,9 +140,15 @@ class ServerManager:
         try:
             if force:
                 self._container.kill()
+                if self._backup_container:
+                    self._backup_container.kill()
             else:
                 self._container.stop()
+                if self._backup_container:
+                    self._backup_container.stop()
             self._log.success("Successfully Stopped Server")
+            if self._backup_container:
+                self._log.success("Successfully Stopped Backup Service")
         except:
             self._log.err("Failed to Stop Server")
 
@@ -145,11 +157,10 @@ class ServerManager:
         Restarts a docker container
         """
         try:
-            if force:
-                self._container.kill()
-                self._container.start()
-            else:
-                self._container.restart()
+            self.stop_server(force=force)
+            self._container.start()
+            if self._backup_container:
+                self._backup_container.start()
             self._log.success("Successfully Restarted Server")
         except:
             self._log.err("Failed to Restart Server")

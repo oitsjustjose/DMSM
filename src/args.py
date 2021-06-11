@@ -5,8 +5,8 @@ Author: Jose Stovall | oitsjustjose
 import argparse
 import sys
 
-from logger import Logger
 from constants import SERVER_ENVS
+from logger import Logger
 
 
 def get_args() -> argparse.Namespace:
@@ -98,8 +98,18 @@ def _create(parser: argparse.ArgumentParser):
         required=True,
     )
 
-    for env in SERVER_ENVS:
+    optional.add_argument(
+        "-j",
+        "--java",
+        help="Allows you to specify the java version",
+        choices=["8", "11", "16"],
+        default=16,
+        required=False,
+    )
+
+    for env in SERVER_ENVS.keys():
         optional.add_argument(
-            f"--{env.lower()}",
+            f"--{env}",
             required=False,
+            type=SERVER_ENVS[env],
         )

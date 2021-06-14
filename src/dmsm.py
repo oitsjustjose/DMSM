@@ -2,7 +2,6 @@
 Author: Jose Stovall | oitsjustjose
 """
 
-import sys
 from argparse import Namespace
 
 from args import get_args

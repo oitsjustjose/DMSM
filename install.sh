@@ -6,7 +6,7 @@ then
     exit 1;
 fi
 
-export url="https://github.com/oitsjustjose/DMSM/releases/download/1.1.0/dmsm_x86-64"
+export url="https://github.com/oitsjustjose/DMSM/releases/download/1.1.1/dmsm_x86-64"
 
 if [ ! $(command -v docker) ]
 then

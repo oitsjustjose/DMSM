@@ -73,6 +73,8 @@ class ServerManager:
                 environment=_build_env(args),
                 volumes={args.root: {"bind": "/data", "mode": "rw"}},
                 detach=True,
+                tty=True,
+                stdin_open=True,
             )
             self._container = self._get_container(self._name)
             self._log.success("Successfully Created Server")

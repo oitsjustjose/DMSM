@@ -89,15 +89,15 @@ class ServerManager:
         Creates a container for the backup service
         """
         try:
-            self._backup_container = self._client.containers.run(
+            self._client.containers.run(
                 "itzg/mc-backup",
                 name=f"{self._name}-Backup",
-                environment={"INITIAL_DELAY": "0m", "BACKUP_INTERVAL": "30m"},
+                environment={"INITIAL_DELAY": "30m", "BACKUP_INTERVAL": "30m"},
                 volumes={
                     args.root: {"bind": "/data", "mode": "ro"},
                     args.backup: {"bind": "/backups", "mode": "rw"},
                 },
-                network=f"container:{self._name}",
+                network_mode=f"container:{self._name}",
                 detach=True,
             )
             self._backup_container = self._get_container(f"{self._name}-Backup")

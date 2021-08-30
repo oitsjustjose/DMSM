@@ -40,8 +40,9 @@ You can find all flags individually detailed (by hand 😓), within [flags.md](h
 
 ## Building
 
-Building this tool is straight forward. What you'll need:
+Building this tool is straight forward, and needs to be done in some Debain distro. What you'll need:
 
+- `sudo apt-get install libcairo2-dev libjpeg-dev libgif-dev libssl-dev libgirepository1.0-dev`
 - Python 3.6 -- **this version is specific**
 - Pip for Python 3.6
 - Pip Packages described in `requirements.txt` (you can install them via `pip install -r requirements.txt`)

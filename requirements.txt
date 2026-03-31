@@ -32,7 +32,7 @@ pipenv==2020.8.13
 pycodestyle==2.6.0
 pycrypto==2.6.1
 pyflakes==2.2.0
-Pygments==2.7.2
+Pygments==2.15.0
 pygobject
 pylint==2.8.3
 pyxdg==0.25
